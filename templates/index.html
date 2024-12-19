@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Symptom Prediction</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f9;
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+            padding: 20px;
+            background-color: white;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #4CAF50;
+            border: none;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #e9ffe9;
+            border: 1px solid #4CAF50;
+            border-radius: 5px;
+            font-size: 18px;
+        }
+        .error {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #ffe9e9;
+            border: 1px solid #f44336;
+            border-radius: 5px;
+            font-size: 18px;
+            color: #f44336;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2>Symptom Prediction</h2>
+        <form id="symptomForm">
+            <label for="symptoms">Enter Symptoms:</label>
+            <input type="text" id="symptoms" name="symptoms" placeholder="Enter symptoms like sweating, trembling, etc." required>
+            <button type="submit">Predict Condition</button>
+        </form>
+
+        <div id="result" class="result" style="display: none;">
+            <h3>Condition:</h3>
+            <p id="condition"></p>
+            <h3>Treatments:</h3>
+            <p id="treatments"></p>
+        </div>
+
+        <div id="error" class="error" style="display: none;">
+            <p id="errorMessage"></p>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('symptomForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            const symptoms = document.getElementById('symptoms').value;
+
+            fetch('/predict', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ symptoms: symptoms })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.condition) {
+                    document.getElementById('result').style.display = 'block';
+                    document.getElementById('condition').textContent = data.condition;
+                    document.getElementById('treatments').textContent = data.treatments;
+                    document.getElementById('error').style.display = 'none';
+                } else {
+                    document.getElementById('error').style.display = 'block';
+                    document.getElementById('errorMessage').textContent = 'An error occurred: ' + data.error;
+                    document.getElementById('result').style.display = 'none';
+                }
+            })
+            .catch(error => {
+                document.getElementById('error').style.display = 'block';
+                document.getElementById('errorMessage').textContent = 'An error occurred: ' + error.message;
+                document.getElementById('result').style.display = 'none';
+            });
+        });
+    </script>
+
+</body>
+</html>
